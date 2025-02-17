@@ -3,11 +3,9 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 import { LatestInvoice } from '@/app/lib/definitions';
-export default async function LatestInvoices({
-  latestInvoices,
-}: {
-  latestInvoices: LatestInvoice[];
-}) {
+import { fetchLatestInvoices } from '@/app/lib/data';
+export default async function LatestInvoices() {
+  const latestInvoices = await fetchLatestInvoices()
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -16,7 +14,7 @@ export default async function LatestInvoices({
       <div className="flex grow flex-col justify-between rounded-xl bg-blue-950 p-4">
         {/* NOTE: Uncomment this code in Chapter 7 */}
 
-        <div className="bg-black text-white px-6">
+        <div className="bg-black text-white px-6 rounded-md">
           {latestInvoices.map((invoice, i) => {
             return (
               <div
