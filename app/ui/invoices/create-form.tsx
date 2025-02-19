@@ -1,3 +1,4 @@
+'use client'
 import { CustomerField } from '@/app/lib/definitions';
 import Link from 'next/link';
 import {
@@ -7,11 +8,14 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
-import { createInvoice } from '@/app/lib/actions';
+import { createInvoice, State } from '@/app/lib/actions';
+import { useActionState } from 'react';
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
+  const initialState: State = {message: null, errors: {}}
+  const [state, formAction] = useActionState(createInvoice, initialState);
   return (
-    <form action={createInvoice}>
+    <form action={formAction}>
       <div className="rounded-md bg-gray-950 text-white p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
@@ -24,6 +28,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               name="customerId"
               className="peer block w-full cursor-pointer rounded-md border border-white py-2 pl-10 text-sm outline-2 bg-black placeholder:text-gray-950"
               defaultValue=""
+              aria-describedby='customer-error'
             >
               <option value="" disabled>
                 Select a customer
@@ -33,11 +38,19 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                   {customer.name}
                 </option>
               ))}
-            </select>
+            </select> 
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white" />
           </div>
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.customerId &&
+              state.errors.customerId.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
         </div>
-
+                     
         {/* Invoice Amount */}
         <div className="mb-4">
           <label htmlFor="amount" className="mb-2 block text-sm font-medium">
@@ -52,6 +65,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                 step="0.01"
                 placeholder="Enter USD amount"
                 className="peer block w-full rounded-md bg-black border border-white py-2 pl-10 text-sm outline-2 text0black placeholder:text-white"
+                required
               />
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white" />
             </div>
